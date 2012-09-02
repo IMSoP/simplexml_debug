@@ -94,8 +94,8 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 			
 			foreach ( $all_ns as $ns_alias => $ns_uri )
 			{
-				$children = count($item->children($ns_uri));
-				$attributes = count($item->attributes($ns_uri));
+				$children = $item->children($ns_uri);
+				$attributes = $item->attributes($ns_uri);
 				
 				// Somewhat confusingly, in the case where a parent element is missing the xmlns declaration,
 				//	but a descendant adds it, SimpleXML will look ahead and fill $all_ns[''] incorrectly
@@ -104,19 +104,19 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 					&&
 					! is_null($ns_uri)
 					&&
-					$children == 0
+					count($children) == 0
 					&&
-					$attributes == 0
+					count($attributes) == 0
 				)
 				{
 					// Try looking for a default namespace without a known URI
 					$ns_uri = NULL;
-					$children = count($item->children($ns_uri));
-					$attributes = count($item->attributes($ns_uri));
+					$children = $item->children($ns_uri);
+					$attributes = $item->attributes($ns_uri);
 				}
 
 				// Don't show zero-counts, as they're not that useful
-				if ( $children == 0 && $attributes == 0 )
+				if ( count($children) == 0 && count($attributes) == 0 )
 				{
 					continue;
 				}
@@ -128,8 +128,42 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 				{
 					$dump .= $indent . $indent . $indent . 'Namespace URI: \'' . $ns_uri . '\'' . PHP_EOL;
 				}
-				$dump .= $indent . $indent . $indent . 'Children: ' . $children . PHP_EOL;
-				$dump .= $indent . $indent . $indent . 'Attributes: ' . $attributes . PHP_EOL;
+				
+				// Count occurrence of child element names, rather than listing them all out
+				$child_names = array();
+				foreach ( $children as $sx_child )
+				{
+					$child_names[ $sx_child->getName() ]++;
+				}
+				ksort($child_names);
+				$child_name_output = array();
+				foreach ( $child_names as $name => $count )
+				{
+					$child_name_output[] = "$count '$name'";
+				}
+				
+				$dump .= $indent . $indent . $indent . 'Children: ' . count($children);
+				// Don't output a trailing " - " if there are no children
+				if ( count($children) > 0 )
+				{
+					$dump .= ' - ' . implode(', ', $child_name_output);
+				}
+				$dump .= PHP_EOL;
+				
+				// Attributes can't be duplicated, but I'm going to put them in alphabetical order
+				$attribute_names = array();
+				foreach ( $attributes as $sx_attribute )
+				{
+					$attribute_names[] = "'" . $sx_attribute->getName() . "'";
+				}
+				ksort($attribute_names);
+				$dump .= $indent . $indent . $indent . 'Attributes: ' . count($attributes);
+				// Don't output a trailing " - " if there are no attributes
+				if ( count($attributes) > 0 )
+				{
+					$dump .= ' - ' . implode(', ', $attribute_names);
+				}
+				$dump .= PHP_EOL;
 			}
 
 			$dump .= $indent . '}' . PHP_EOL;
