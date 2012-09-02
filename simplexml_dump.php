@@ -54,27 +54,36 @@ function simplexml_dump(SimpleXMLElement $sxml)
 			$dump .= $indent . $indent . 'String Content: \'' . (string)$item . '\'' . PHP_EOL;
 
 			// Now some statistics about attributes and children, by namespace
-			$dump .= $indent . $indent . 'Structural Content:' . PHP_EOL;
-
-			// If the default namespace is not declared, it will never show up using the below code
-			// (This is probably bad XML, or at least bad practice, but the aim here is to leave nothing invisible)
-			if ( ! array_key_exists('', $item->getDocNamespaces()) )
-			{
-				$dump .= $indent . $indent . $indent . '[Default, Undeclared Namespace]' . PHP_EOL;
-
-				$dump .= $indent . $indent . $indent . $indent . 'Children: ' . count($item->children(NULL)) . PHP_EOL;
-				$dump .= $indent . $indent . $indent . $indent . 'Attributes: ' . count($item->attributes(NULL)) . PHP_EOL;
-			}
 
 			$all_ns = $item->getNamespaces(true);
+			// If the default namespace is never declared, it will never show up using the below code
+			// This will still mess up in the case where a parent element is missing the xmlns declaration,
+			//	but a child adds it, because SimpleXML will look ahead and fill $all_ns[''] incorrectly
+			if ( ! array_key_exists('', $all_ns) )
+			{
+				$all_ns[''] = NULL;
+			}
+
 			foreach ( $all_ns as $ns_alias => $ns_uri )
 			{
-				$ns_label = (($ns_alias == '') ? '[Default Namespace]' : "Namespace $ns_alias");
-				$dump .= $indent . $indent . $indent . $ns_label . PHP_EOL;
+				$children = count($item->children($ns_uri));
+				$attributes = count($item->attributes($ns_uri));
 
-				$dump .= $indent . $indent . $indent . $indent . 'Namespace URI: \'' . $ns_uri . '\'' . PHP_EOL;
-				$dump .= $indent . $indent . $indent . $indent . 'Children: ' . count($item->children($ns_uri)) . PHP_EOL;
-				$dump .= $indent . $indent . $indent . $indent . 'Attributes: ' . count($item->attributes($ns_uri)) . PHP_EOL;
+				// Don't show zero-counts, as they're not that useful
+				if ( $children == 0 && $attributes == 0 )
+				{
+					continue;
+				}
+
+				$ns_label = (($ns_alias == '') ? 'Default Namespace' : "Namespace $ns_alias");
+				$dump .= $indent . $indent . 'Content in ' . $ns_label . PHP_EOL;
+
+				if ( ! is_null($ns_uri) )
+				{
+					$dump .= $indent . $indent . $indent . 'Namespace URI: \'' . $ns_uri . '\'' . PHP_EOL;
+				}
+				$dump .= $indent . $indent . $indent . 'Children: ' . $children . PHP_EOL;
+				$dump .= $indent . $indent . $indent . 'Attributes: ' . $attributes . PHP_EOL;
 			}
 
 			$dump .= $indent . '}' . PHP_EOL;
@@ -89,25 +98,27 @@ function simplexml_dump(SimpleXMLElement $sxml)
 }
 
 $x = <<<XML
-<?xml version="1.0"?>
-<foo xmlns="http://example.com" xmlns:a="http://example.com/a" xmlns:b="http://example.com/b">
-	<bar>some text</bar>
-	<bar>ooo <![CDATA[some cdata yaha!]]></bar>
-	<bar b:thing="Thing!" b:nowt="" />
-	<deeper bob="jane">
-		<a:bar />
-		<a:bar />
-	</deeper>
-</foo>
+<?xml version="1.0" encoding="utf-8"?>
+<Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <loofah />
+  <soapenv:Body>
+    <requestContactResponse xmlns="http://webservice.foo.com">
+      <requestContactReturn>
+        <errorCode xsi:nil="true"/>
+        <errorDesc xsi:nil="true"/>
+        <id>744</id>
+        <soapenv:id>744</soapenv:id>
+      </requestContactReturn>
+    </requestContactResponse>
+  </soapenv:Body>
+</Envelope>
 XML;
 
 $sx = simplexml_load_string($x);
 
 simplexml_dump($sx);
-simplexml_dump($sx->children());
-simplexml_dump($sx->deeper);
-simplexml_dump($sx->deeper->children('a', true));
-simplexml_dump($sx->bar[2]->attributes('b', true));
-simplexml_dump($sx->deeper['bob']);
-
+simplexml_dump($sx->children(NULL));
+simplexml_dump($sx->children("soapenv", true)->Body);
+simplexml_dump($sx->children("soapenv", true)->Body->children(NULL)->requestContactResponse->requestContactReturn->id);
+simplexml_dump($sx->children("soapenv", true)->Body->children(NULL)->requestContactResponse->requestContactReturn->children('soapenv', true)->id);
 
