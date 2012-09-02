@@ -13,6 +13,10 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 {
 	$indent = "\t";
 
+	// Get all the namespaces declared at the *root* of this document
+	// All the items we're looking at are in the same document, so we only need do this once
+	$doc_ns = $sxml->getDocNamespaces(false);
+	
 	$dump = '';
 	// Note that the header is added at the end, so we can add stats
 	$dump .= '[' . PHP_EOL;
@@ -83,17 +87,33 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 			// 	whether declared in this node, in its ancestors, or in its descendants
 			$all_ns = $item->getNamespaces(true);
 			// If the default namespace is never declared, it will never show up using the below code
-			// This will still mess up in the case where a parent element is missing the xmlns declaration,
-			//	but a descendant adds it, because SimpleXML will look ahead and fill $all_ns[''] incorrectly
 			if ( ! array_key_exists('', $all_ns) )
 			{
 				$all_ns[''] = NULL;
 			}
-
+			
 			foreach ( $all_ns as $ns_alias => $ns_uri )
 			{
 				$children = count($item->children($ns_uri));
 				$attributes = count($item->attributes($ns_uri));
+				
+				// Somewhat confusingly, in the case where a parent element is missing the xmlns declaration,
+				//	but a descendant adds it, SimpleXML will look ahead and fill $all_ns[''] incorrectly
+				if ( 
+					$ns_alias == ''
+					&&
+					! is_null($ns_uri)
+					&&
+					$children == 0
+					&&
+					$attributes == 0
+				)
+				{
+					// Try looking for a default namespace without a known URI
+					$ns_uri = NULL;
+					$children = count($item->children($ns_uri));
+					$attributes = count($item->attributes($ns_uri));
+				}
 
 				// Don't show zero-counts, as they're not that useful
 				if ( $children == 0 && $attributes == 0 )
