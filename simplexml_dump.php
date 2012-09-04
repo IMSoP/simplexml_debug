@@ -8,6 +8,10 @@
  * @param SimpleXMLElement $sxml The object to inspect
  * @param boolean $return Default false. If true, return the "dumped" info rather than echoing it
  * @return null|string Nothing, or output, depending on $return param
+ *
+ * @author Rowan Collins
+ * @see https://github.com/IMSoP/simplexml_debug
+ * @license http://creativecommons.org/licenses/by/3.0/ Creative Commons Attribution 3.0
  */
 function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 {
