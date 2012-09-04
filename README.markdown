@@ -23,6 +23,7 @@ Read the PHPDoc, and try it out, to see exactly how it works but to give you a t
 * Displays the namespace alias and URI of the current element, and all its direct children.
 * Lists the total number and name of all attributes on an element (broken down by namespace).
 * Lists the total number of direct children (broken down by namespace) along with a summary of their names (e.g. the fact that there are 500 `Result` elements and 1 `Info` element).
+* Shows complete string content of a node, *including CDATA*.
 
 Limitations and Warnings
 ------------------------
