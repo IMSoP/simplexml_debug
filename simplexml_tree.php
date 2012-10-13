@@ -45,7 +45,7 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_attributes_and_content=
 		{
 			// To what namespace does this attribute belong? Returns array( alias => URI )
 			$ns = $root_item->getNamespaces(false);
-			if ( $ns )
+			if ( key($ns) )
 			{
 				$dump .= key($ns) . ':';
 			}
@@ -58,7 +58,7 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_attributes_and_content=
 		// Display the root node as an XML tag
 		// To what namespace does this attribute belong? Returns array( alias => URI )
 		$ns = $root_item->getNamespaces(false);
-		if ( $ns )
+		if ( key($ns) )
 		{
 			$root_node_name = key($ns) . ':' . $root_item->getName();
 		}
@@ -118,6 +118,13 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 		}
 	}
 		
+	// To what namespace does this element belong? Returns array( alias => URI )
+	$item_ns = $item->getNamespaces(false);
+	if ( ! $item_ns )
+	{
+		$item_ns = array('' => NULL);
+	}
+	
 	// This returns all namespaces used by this node and all its descendants,
 	// 	whether declared in this node, in its ancestors, or in its descendants
 	$all_ns = $item->getNamespaces(true);
@@ -127,33 +134,25 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 		$all_ns[''] = NULL;
 	}
 	
+	// Prioritise "current" namespace by merging into onto the beginning of the list
+	// (it will be added to the beginning and the duplicate entry dropped)  
+	$all_ns = array_merge($item_ns, $all_ns);
+	
 	foreach ( $all_ns as $ns_alias => $ns_uri )
 	{
-		$children = $item->children($ns_uri);
-		$attributes = $item->attributes($ns_uri);
+		$children = $item->children($ns_alias, true);
+		$attributes = $item->attributes($ns_alias, true);
 		
-		// Somewhat confusingly, in the case where a parent element is missing the xmlns declaration,
-		//	but a descendant adds it, SimpleXML will look ahead and fill $all_ns[''] incorrectly
-		if ( 
-			$ns_alias == ''
-			&&
-			! is_null($ns_uri)
-			&&
-			count($children) == 0
-			&&
-			count($attributes) == 0
-		)
-		{
-			// Try looking for a default namespace without a known URI
-			$ns_uri = NULL;
-			$children = $item->children($ns_uri);
-			$attributes = $item->attributes($ns_uri);
-		}
+		// If things are in the current namespace, display them a bit differently
+		$is_current_namespace = ( $ns_uri == reset($item_ns) );
 		
 		if ( count($attributes) > 0 && $include_attributes_and_content )
 		{
-			$dump .= str_repeat($indent, $depth)
-				. "->attributes('$ns_alias', true)" . PHP_EOL;
+			if ( ! $is_current_namespace )
+			{
+				$dump .= str_repeat($indent, $depth)
+					. "->attributes('$ns_alias', true)" . PHP_EOL;
+			}
 			
 			foreach ( $attributes as $sx_attribute )
 			{
@@ -168,18 +167,39 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 				}
 				
 				// Output the attribute
-				// e.g. ->attribName (3 chars): 'foo'
-				$dump .= str_repeat($indent, $depth+1)
-					. '->' . $item->getName()
-					. ' (' . strlen($string_content) . ' chars): '
-					. "'$string_extract'" . PHP_EOL;
+				if ( $is_current_namespace )
+				{
+					// In current namespace
+					// e.g. ['attribName'] (3 chars): 'foo'
+					$dump .= str_repeat($indent, $depth)
+						. "['" . $sx_attribute->getName() . "']"
+						. ' (' . strlen($string_content) . ' chars): '
+						. "'$string_extract'" . PHP_EOL;
+				}
+				else
+				{
+					// After a call to ->attributes()
+					// e.g. ->attribName (3 chars): 'foo'
+					$dump .= str_repeat($indent, $depth+1)
+						. '->' . $sx_attribute->getName()
+						. ' (' . strlen($string_content) . ' chars): '
+						. "'$string_extract'" . PHP_EOL;
+				}
 			}
 		}
 		
 		if ( count($children) > 0 )
 		{
-			$dump .= str_repeat($indent, $depth)
-				. "->children('$ns_alias', true)" . PHP_EOL;
+			if ( $is_current_namespace )
+			{
+				$display_depth = $depth;
+			}
+			else
+			{
+				$dump .= str_repeat($indent, $depth)
+					. "->children('$ns_alias', true)" . PHP_EOL;
+				$display_depth = $depth + 1;
+			}
 			
 			// Recurse through the children with headers showing how to access them
 			$child_names = array();
@@ -198,13 +218,13 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 				}
 				
 				// e.g. ->Foo[0]
-				$dump .= str_repeat($indent, $depth+1)
-					. '->' . $item->getName()
-					. '[' . $child_names[$child_node_name]-1 . ']'
+				$dump .= str_repeat($indent, $display_depth)
+					. '->' . $sx_child->getName()
+					. '[' . ($child_names[$child_node_name]-1) . ']'
 					. PHP_EOL;
 				
 				$dump .= _simplexml_tree_recursively_process_node(
-					$sx_child, $depth+2,
+					$sx_child, $display_depth+1,
 					$include_attributes_and_content, $indent, $content_extract_size
 				);
 			}
