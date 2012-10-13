@@ -137,7 +137,17 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 				$child_names = array();
 				foreach ( $children as $sx_child )
 				{
-					$child_names[ $sx_child->getName() ]++;
+					// Below is a rather clunky way of saying $child_names[ $sx_child->getName() ]++;
+					// 	which avoids Notices about unset array keys
+					$child_node_name = $sx_child->getName();
+                                        if ( array_key_exists($child_node_name, $child_names) )
+                                        {
+                                                $child_names[$child_node_name]++;
+                                        }
+                                        else
+                                        {
+                                                $child_names[$child_node_name] = 1;
+                                        }
 				}
 				ksort($child_names);
 				$child_name_output = array();
