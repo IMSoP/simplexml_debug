@@ -7,8 +7,8 @@
  * Additionally, the output format is designed as a hint of the syntax needed to traverse the object.  
  *
  * @param SimpleXMLElement $sxml The object to inspect
- * @param boolean $include_attributes_and_content Default false. If true, will summarise attributes
- *	and textual content, as well as child elements
+ * @param boolean $include_string_content Default false. If true, will summarise textual content, 
+  * 	as well as child elements and attribute names
  * @param boolean $return Default false. If true, return the "dumped" info rather than echoing it
  * @return null|string Nothing, or output, depending on $return param
  *
@@ -16,7 +16,7 @@
  * @see https://github.com/IMSoP/simplexml_debug
  * @license http://creativecommons.org/licenses/by/3.0/ Creative Commons Attribution 3.0
  */
-function simplexml_tree(SimpleXMLElement $sxml, $include_attributes_and_content=false, $return=false)
+function simplexml_tree(SimpleXMLElement $sxml, $include_string_content=false, $return=false)
 {
 	$indent = "\t";
 	$content_extract_size = 15;
@@ -73,7 +73,7 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_attributes_and_content=
 		// Each item on the stack is of the form array(int $depth, SimpleXMLElement $element, string $header_row)
 		$dump .= _simplexml_tree_recursively_process_node(
 			$root_item, 1,
-			$include_attributes_and_content, $indent, $content_extract_size
+			$include_string_content, $indent, $content_extract_size
 		);
 	}
 
@@ -94,11 +94,11 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_attributes_and_content=
  * "Private" function to perform the recursive part of simplexml_tree()
  * Do not call this function directly or rely on its function signature remaining stable
  */
-function _simplexml_tree_recursively_process_node($item, $depth, $include_attributes_and_content, $indent, $content_extract_size)
+function _simplexml_tree_recursively_process_node($item, $depth, $include_string_content, $indent, $content_extract_size)
 {
 	$dump = '';
 	
-	if ( $include_attributes_and_content )
+	if ( $include_string_content )
 	{
 		// Show a chunk of the beginning of the content string, collapsing whitespace HTML-style
 		$string_content = (string)$item;
@@ -148,7 +148,7 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 		// If things are in the current namespace, display them a bit differently
 		$is_current_namespace = ( $ns_uri == reset($item_ns) );
 		
-		if ( count($attributes) > 0 && $include_attributes_and_content )
+		if ( count($attributes) > 0 )
 		{
 			if ( ! $is_current_namespace )
 			{
@@ -158,16 +158,6 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 			
 			foreach ( $attributes as $sx_attribute )
 			{
-				// Show a chunk of the beginning of the content string, collapsing whitespace HTML-style
-				$string_content = (string)$sx_attribute;
-				
-				$string_extract = preg_replace('/\s+/', ' ', trim($string_content));
-				if ( strlen($string_extract) > $content_extract_size )
-				{
-					$string_extract = substr($string_extract, 0, $content_extract_size)
-						. '...';
-				}
-				
 				// Output the attribute
 				if ( $is_current_namespace )
 				{
@@ -176,11 +166,7 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 					$dump .= str_repeat($indent, $depth)
 						. "['" . $sx_attribute->getName() . "']"
 						. PHP_EOL;
-					$dump .= str_repeat($indent, $depth+1)
-						. '(string) '
-						. "'$string_extract'"
-						. ' (' . strlen($string_content) . ' chars)'
-						 . PHP_EOL;
+					$string_display_depth = $depth+1;
 				}
 				else
 				{
@@ -189,7 +175,22 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 					$dump .= str_repeat($indent, $depth+1)
 						. '->' . $sx_attribute->getName()
 						. PHP_EOL;
-					$dump .= str_repeat($indent, $depth+2)
+					$string_display_depth = $depth+2;
+				}
+				
+				if ( $include_string_content )
+				{
+					// Show a chunk of the beginning of the content string, collapsing whitespace HTML-style
+					$string_content = (string)$sx_attribute;
+					
+					$string_extract = preg_replace('/\s+/', ' ', trim($string_content));
+					if ( strlen($string_extract) > $content_extract_size )
+					{
+						$string_extract = substr($string_extract, 0, $content_extract_size)
+							. '...';
+					}
+					
+					$dump .= str_repeat($indent, $string_display_depth)
 						. '(string) '
 						. "'$string_extract'"
 						. ' (' . strlen($string_content) . ' chars)'
@@ -235,7 +236,7 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 				
 				$dump .= _simplexml_tree_recursively_process_node(
 					$sx_child, $display_depth+1,
-					$include_attributes_and_content, $indent, $content_extract_size
+					$include_string_content, $indent, $content_extract_size
 				);
 			}
 		}
