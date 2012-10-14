@@ -12,7 +12,8 @@ So the obvious question is: What do I use instead when I want to inspect my Simp
 What?
 =====
 
-The first piece of this project (more may be to come) is a simple function - `simplexml_dump()` - which echoes a basic summary of any `SimpleXMLElement` object you give it.
+* The first piece of this project is a simple function - `simplexml_dump()` - which echoes a basic summary of any `SimpleXMLElement` object you give it.
+* Early feedback from users on StackOverflow was that a fully recursive function would be useful, although this would obviously need to do something different from an XML pretty-printer. The next function is therefore `simplexml_tree()`  which shows an entire XML structure in summarised tree form. The output is designed to show exactly what operators and methods are needed to access each node shown.
 
 Features
 --------
