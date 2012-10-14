@@ -113,8 +113,10 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 		if ( strlen($string_content) > 0 )
 		{
 			$dump .= str_repeat($indent, $depth)
-				. 'string content (' . strlen($string_content) . ' chars): '
-				. "'$string_extract'" . PHP_EOL;
+				. '(string) '
+				. "'$string_extract'"
+				. ' (' . strlen($string_content) . ' chars)'
+				 . PHP_EOL;
 		}
 	}
 		
@@ -170,20 +172,28 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_attrib
 				if ( $is_current_namespace )
 				{
 					// In current namespace
-					// e.g. ['attribName'] (3 chars): 'foo'
+					// e.g. ['attribName']
 					$dump .= str_repeat($indent, $depth)
 						. "['" . $sx_attribute->getName() . "']"
-						. ' (' . strlen($string_content) . ' chars): '
-						. "'$string_extract'" . PHP_EOL;
+						. PHP_EOL;
+					$dump .= str_repeat($indent, $depth+1)
+						. '(string) '
+						. "'$string_extract'"
+						. ' (' . strlen($string_content) . ' chars)'
+						 . PHP_EOL;
 				}
 				else
 				{
 					// After a call to ->attributes()
-					// e.g. ->attribName (3 chars): 'foo'
+					// e.g. ->attribName
 					$dump .= str_repeat($indent, $depth+1)
 						. '->' . $sx_attribute->getName()
-						. ' (' . strlen($string_content) . ' chars): '
-						. "'$string_extract'" . PHP_EOL;
+						. PHP_EOL;
+					$dump .= str_repeat($indent, $depth+2)
+						. '(string) '
+						. "'$string_extract'"
+						. ' (' . strlen($string_content) . ' chars)'
+						 . PHP_EOL;
 				}
 			}
 		}
