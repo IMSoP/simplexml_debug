@@ -35,7 +35,6 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_string_content=false, $
 	while ( isset($sxml[$root_item_index]) )
 	{
 		$root_item = $sxml[$root_item_index];
-		$root_item_index++;
 		
 		// Special case if the root is actually an attribute
 		// It's surprisingly hard to find something which behaves consistently differently for an attribute and an element within SimpleXML
@@ -50,31 +49,34 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_string_content=false, $
 				$dump .= key($ns) . ':';
 			}
 			$dump .=  $root_item->getName() . '="' . (string)$root_item . '"' . PHP_EOL;
-			
-			// Jump to begining of outer loop; avoids indenting the rest of the code as an else block
-			continue;
-		}
-		
-		// Display the root node as an XML tag
-		// To what namespace does this attribute belong? Returns array( alias => URI )
-		$ns = $root_item->getNamespaces(false);
-		if ( key($ns) )
-		{
-			$root_node_name = key($ns) . ':' . $root_item->getName();
 		}
 		else
 		{
-			$root_node_name = $root_item->getName();
+			// Display the root node as a numeric key reference, plus a hint as to its tag name 
+			// e.g. '[42] // <Answer>'
+			
+			// To what namespace does this attribute belong? Returns array( alias => URI )
+			$ns = $root_item->getNamespaces(false);
+			if ( key($ns) )
+			{
+				$root_node_name = key($ns) . ':' . $root_item->getName();
+			}
+			else
+			{
+				$root_node_name = $root_item->getName();
+			}
+			$dump .=  "[$root_item_index] // <$root_node_name>" . PHP_EOL;
+			
+			// This function is effectively recursing depth-first through the tree,
+			// but this is managed manually using a stack rather than actual recursion
+			// Each item on the stack is of the form array(int $depth, SimpleXMLElement $element, string $header_row)
+			$dump .= _simplexml_tree_recursively_process_node(
+				$root_item, 1,
+				$include_string_content, $indent, $content_extract_size
+			);
 		}
-		$dump .=  "<$root_node_name>" . PHP_EOL;
 		
-		// This function is effectively recursing depth-first through the tree,
-		// but this is managed manually using a stack rather than actual recursion
-		// Each item on the stack is of the form array(int $depth, SimpleXMLElement $element, string $header_row)
-		$dump .= _simplexml_tree_recursively_process_node(
-			$root_item, 1,
-			$include_string_content, $indent, $content_extract_size
-		);
+		$root_item_index++;
 	}
 
 	// Add on the header line, with the total number of items output
