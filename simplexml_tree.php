@@ -14,7 +14,8 @@
  *
  * @author Rowan Collins
  * @see https://github.com/IMSoP/simplexml_debug
- * @license http://creativecommons.org/licenses/by/3.0/ Creative Commons Attribution 3.0
+ * @license None. Do what you like with it, but please give me credit if you like it. :)
+ * Equally, no warranty: don't blame me if your aircraft or nuclear power plant fails because of this code!  
  */
 function simplexml_tree(SimpleXMLElement $sxml, $include_string_content=false, $return=false)
 {
