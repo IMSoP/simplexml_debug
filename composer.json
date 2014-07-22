@@ -1,0 +1,20 @@
+{
+	"name": "imsop/simplexml_debug",
+	"description": "Tools for debugging your code when working with PHP's SimpleXML functions.",
+	"authors": [{
+		"name": "Rowan Collins",
+		"homepage": "http://rwec.co.uk",
+		"role": "Lead"
+	},{
+		"name": "Josh Sherman",
+		"email": "josh@gravityblvd.com",
+		"homepage": "http://joshtronic.com",
+		"role": "Contributor"
+	}],
+	"autoload": {
+		"classmap": ["src/"]
+	},
+	"require-dev": {
+		"satooshi/php-coveralls": "dev-master"
+	}
+}
