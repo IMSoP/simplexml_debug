@@ -18,7 +18,25 @@ class simplexml_dump_Test extends simplexml_dump_bootstrap
 ]
 ";
 
-		$this->expected_NS = "SimpleXML object (1 item)
+		$this->expected_default_NS = "SimpleXML object (1 item)
+[
+	Element {
+		Namespace: 'https://github.com/IMSoP/simplexml_debug'
+		(Default Namespace)
+		Name: 'movies'
+		String Content: '
+				
+			'
+		Content in Default Namespace
+			Namespace URI: 'https://github.com/IMSoP/simplexml_debug'
+			Children: 1 - 1 'movie'
+			Attributes: 0
+	}
+]
+";
+
+
+		$this->expected_named_NS = "SimpleXML object (1 item)
 [
 	Element {
 		Name: 'movies'
@@ -52,13 +70,19 @@ class simplexml_dump_Test extends simplexml_dump_bootstrap
 		$this->assertEquals($this->expected, $return);
 	}
 
-	public function testDumpWithNS()
+	public function testDumpWithDefaultNS()
 	{
-		$return = simplexml_dump($this->simpleXML_NS, true);
-		$this->assertEquals($this->expected_NS, $return);
+		$return = simplexml_dump($this->simpleXML_default_NS, true);
+		$this->assertEquals($this->expected_default_NS, $return);
 	}
 
-	public function testDumpWithSingleNodeWithAttributesAndNS()
+	public function testDumpWithNamedNS()
+	{
+		$return = simplexml_dump($this->simpleXML_named_NS, true);
+		$this->assertEquals($this->expected_named_NS, $return);
+	}
+
+	public function testDumpAttributeWithNamedNS()
 	{
 		$xml  = '<parent xmlns:ns="ns"><ns:child ns:foo="bar" /></parent>';
 		$sxml = simplexml_load_string($xml);
@@ -72,6 +96,31 @@ class simplexml_dump_Test extends simplexml_dump_bootstrap
 		Namespace Alias: 'ns'
 		Name: 'foo'
 		Value: 'bar'
+	}
+]
+";
+
+		$this->assertEquals($expected, $return);
+	}
+
+	public function testDumpMultipleAttributes()
+	{
+		$xml  = '<parent xmlns:ns="ns"><child ns:one="1" ns:two="2" ns:three="3" /></parent>';
+		$sxml = simplexml_load_string($xml);
+
+		$return = simplexml_dump($sxml->child, true);
+
+		$expected = "SimpleXML object (1 item)
+[
+	Element {
+		Namespace: 'ns'
+		Namespace Alias: 'ns'
+		Name: 'child'
+		String Content: ''
+		Content in Namespace ns
+			Namespace URI: 'ns'
+			Children: 0
+			Attributes: 3 - 'one', 'two', 'three'
 	}
 ]
 ";
