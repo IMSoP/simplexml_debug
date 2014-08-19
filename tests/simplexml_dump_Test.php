@@ -35,7 +35,6 @@ class simplexml_dump_Test extends simplexml_dump_bootstrap
 ]
 ";
 
-
 		$this->expected_named_NS = "SimpleXML object (1 item)
 [
 	Element {
