@@ -1,0 +1,15 @@
+SimpleXML object (1 item)
+[0] // <soap:Envelope>
+	->children('soap', true)
+		->Header[0]
+			->children('s', true)
+				->credentials[0]
+					->children('', true)
+						->username[0]
+						->password[0]
+		->Body[0]
+			->children('tns', true)
+				->DoSomething[0]
+					->children('', true)
+						->from[0]
+						->to[0]

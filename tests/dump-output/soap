@@ -1,0 +1,16 @@
+SimpleXML object (1 item)
+[
+	Element {
+		Namespace: 'http://schemas.xmlsoap.org/soap/envelope/'
+		Namespace Alias: 'soap'
+		Name: 'Envelope'
+		String Content: '
+    
+    
+'
+		Content in Namespace soap
+			Namespace URI: 'http://schemas.xmlsoap.org/soap/envelope/'
+			Children: 2 - 1 'Body', 1 'Header'
+			Attributes: 0
+	}
+]
