@@ -1,0 +1,15 @@
+SimpleXML object (1 item)
+[
+	Element {
+		Namespace: 'http://example.com'
+		(Default Namespace)
+		Name: 'Foo'
+		String Content: '
+    
+'
+		Content in Namespace 'http://example.com'
+			Children: 1 - 1 'MaskingChildElement'
+		Content in Null Namespace
+			Attributes: 1 - 'InvisibleAttribute'
+	}
+]

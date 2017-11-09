@@ -145,32 +145,44 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 	// This returns all namespaces used by this node and all its descendants,
 	// 	whether declared in this node, in its ancestors, or in its descendants
 	$all_ns = $item->getNamespaces(true);
-	// If the default namespace is never declared, it will never show up using the below code
-	if ( ! array_key_exists('', $all_ns) )
+	$has_default_namespace = isset($all_ns['']);
+
+	// If the default namespace is never declared, we need to add a dummy entry for it
+	// We also need to handle the odd fact that attributes are never assigned to the default namespace
+	// The spec basically leaves their meaning undefined: https://www.w3.org/TR/xml-names/#defaulting
+	if ( ! in_array(null, $all_ns, true) )
 	{
-		$all_ns[''] = NULL;
+		$all_ns[] = null;
 	}
 
 	// Prioritise "current" namespace by merging into onto the beginning of the list
-	// (it will be added to the beginning and the duplicate entry dropped)  
-	$all_ns = array_merge(
-		array($item_ns_prefix => $item_ns_uri),
+	// (it will be added to the beginning and the duplicate entry dropped)
+	$all_ns = array_unique(array_merge(
+		array($item_ns_uri),
 		$all_ns
-	);
+	));
 
-	foreach ( $all_ns as $ns_alias => $ns_uri )
+	foreach ( $all_ns as $ns_uri )
 	{
-		$children = $item->children($ns_alias, true);
-		$attributes = $item->attributes($ns_alias, true);
-		
+		$children = $item->children($ns_uri);
+		$attributes = $item->attributes($ns_uri);
+
+		// Don't show children(null) if we have a default namespace defined
+		if ( $has_default_namespace && $ns_uri === null )
+		{
+			$children = array();
+		}
+
 		// If things are in the current namespace, display them a bit differently
 		$is_current_namespace = ( $ns_uri == $item_ns_uri );
+
+		$force_attribute_namespace = ($ns_uri === null && $item_ns_uri !== null);
 
 		$ns_uri_quoted = (strlen($ns_uri) == 0 ? 'null' : "'$ns_uri'");
 
 		if ( count($attributes) > 0 )
 		{
-			if ( ! $is_current_namespace )
+			if ( ! $is_current_namespace || $force_attribute_namespace )
 			{
 				$dump .= str_repeat($indent, $depth)
 					. "->attributes($ns_uri_quoted)" . PHP_EOL;
@@ -179,7 +191,7 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 			foreach ( $attributes as $sx_attribute )
 			{
 				// Output the attribute
-				if ( $is_current_namespace )
+				if ( $is_current_namespace && ! $force_attribute_namespace )
 				{
 					// In current namespace
 					// e.g. ['attribName']

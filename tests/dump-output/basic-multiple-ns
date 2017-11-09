@@ -1,0 +1,13 @@
+SimpleXML object (1 item)
+[
+	Element {
+		Namespace: 'https://github.com/IMSoP/simplexml_debug#movies'
+		Namespace Alias: 'movies'
+		Name: 'movies'
+		String Content: '
+    
+'
+		Content in Namespace 'https://github.com/IMSoP/simplexml_debug#movies'
+			Children: 1 - 1 'movie'
+	}
+]

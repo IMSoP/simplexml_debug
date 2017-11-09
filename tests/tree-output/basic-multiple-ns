@@ -1,0 +1,22 @@
+SimpleXML object (1 item)
+[0] // <movies:movies>
+	->children('https://github.com/IMSoP/simplexml_debug#movies')
+		->movie[0]
+			->title[0]
+			->characters[0]
+				->character[0]
+					->name[0]
+					->actor[0]
+				->character[1]
+					->name[0]
+					->actor[0]
+			->plot[0]
+			->children('https://github.com/IMSoP/simplexml_debug#reviews')
+				->great-lines[0]
+					->line[0]
+				->rating[0]
+					->attributes(null)
+						->type
+				->rating[1]
+					->attributes(null)
+						->type

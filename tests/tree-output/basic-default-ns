@@ -14,6 +14,8 @@ SimpleXML object (1 item)
 			->great-lines[0]
 				->line[0]
 			->rating[0]
-				['type']
+				->attributes(null)
+					->type
 			->rating[1]
-				['type']
+				->attributes(null)
+					->type

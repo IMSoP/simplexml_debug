@@ -1,0 +1,5 @@
+SimpleXML object (1 item)
+[0] // <Foo>
+	['InvisibleAttribute']
+	->children('http://example.com')
+		->MaskingChildElement[0]

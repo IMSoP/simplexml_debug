@@ -5,8 +5,7 @@ SimpleXML object (1 item)
 		String Content: '
     
 '
-		Content in Default Namespace
+		Content in Null Namespace
 			Children: 1 - 1 'movie'
-			Attributes: 0
 	}
 ]
