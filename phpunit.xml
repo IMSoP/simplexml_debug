@@ -1,0 +1,14 @@
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.1/phpunit.xsd"
+        bootstrap="tests/bootstrap.php"
+        backupGlobals="true"
+        verbose="true"
+        colors="true"
+>
+    <testsuites>
+        <testsuite name="SimpleXML Debug Tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
