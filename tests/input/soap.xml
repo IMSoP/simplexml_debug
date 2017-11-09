@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <s:credentials xmlns:s="http://example.org/security">
+            <username>test</username>
+            <password>letmein</password>
+        </s:credentials>
+    </soap:Header>
+    <soap:Body>
+        <tns:DoSomething xmlns:tns="http://example.org/some-soap-service">
+            <from>A</from>
+            <to>B</to>
+        </tns:DoSomething>
+    </soap:Body>
+</soap:Envelope>
