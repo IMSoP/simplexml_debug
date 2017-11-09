@@ -122,14 +122,22 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 				 . PHP_EOL;
 		}
 	}
-		
+
 	// To what namespace does this element belong? Returns array( alias => URI )
-	$item_ns = $item->getNamespaces(false);
-	if ( ! $item_ns )
+	// For top-level elements, cheat, and say they're in the null namespace, to force a ->children() call
+	if ( $depth == 1 )
 	{
 		$item_ns = array('' => NULL);
 	}
-	
+	else
+	{
+		$item_ns = $item->getNamespaces(false);
+		if ( !$item_ns )
+		{
+			$item_ns = array('' => NULL);
+		}
+	}
+
 	// This returns all namespaces used by this node and all its descendants,
 	// 	whether declared in this node, in its ancestors, or in its descendants
 	$all_ns = $item->getNamespaces(true);
