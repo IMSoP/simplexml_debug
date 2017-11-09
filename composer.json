@@ -1,6 +1,7 @@
 {
 	"name": "imsop/simplexml_debug",
 	"description": "Tools for debugging your code when working with PHP's SimpleXML functions.",
+	"license": "MIT",
 	"authors": [{
 		"name": "Rowan Collins",
 		"homepage": "http://rwec.co.uk",

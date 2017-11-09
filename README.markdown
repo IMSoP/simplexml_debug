@@ -38,4 +38,5 @@ Who?
 
 This project was originated by Rowan Collins, AKA IMSoP. My homepage is at <http://rwec.co.uk>, and you can reach me by e-mail on the obvious addresses @ that domain.
 
-The code here is free to use for any purpose whatsoever, but with a polite request that you treat it like Free Software, and a strong request that you don't pass it off as your own. I'm happy for you to take it away, improve it, use it for whatever you like, but I'd like you to credit me as the originator. I'd also be more than happy to hear what you do with it, and how you've improved on it.
+The code is licensed under the MIT license, which means you can pretty much do what you like with it, other than claim you wrote it yourself. I'm happy for you to take it away, improve it, and use it for whatever you like, but
+I'd love to hear what you do with it, and how you've improved on it.
