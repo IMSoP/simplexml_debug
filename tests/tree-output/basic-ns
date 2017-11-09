@@ -1,0 +1,21 @@
+SimpleXML object (1 item)
+[0] // <movies>
+	->children('test', true)
+		->movie[0]
+			->title[0]
+			->characters[0]
+				->character[0]
+					->name[0]
+					->actor[0]
+				->character[1]
+					->name[0]
+					->actor[0]
+			->plot[0]
+			->great-lines[0]
+				->line[0]
+			->rating[0]
+				->attributes('', true)
+					->type
+			->rating[1]
+				->attributes('', true)
+					->type

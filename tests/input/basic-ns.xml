@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<movies xmlns:test="https://github.com/IMSoP/simplexml_debug">
+    <test:movie>
+        <test:title>PHP: Behind the Parser</test:title>
+        <test:characters>
+            <test:character>
+                <test:name>Ms. Coder</test:name>
+                <test:actor>Onlivia Actora</test:actor>
+            </test:character>
+            <test:character>
+                <test:name>Mr. Coder</test:name>
+                <test:actor>El Act&#211;r</test:actor>
+            </test:character>
+        </test:characters>
+        <test:plot>
+            So, this language. It's like, a programming language.
+            Or is it a scripting language? All is revealed in this
+            thrilling horror spoof of a documentary.
+        </test:plot>
+        <test:great-lines>
+            <test:line>PHP solves all my web problems</test:line>
+        </test:great-lines>
+        <test:rating type="thumbs">7</test:rating>
+        <test:rating type="stars">5</test:rating>
+    </test:movie>
+</movies>
