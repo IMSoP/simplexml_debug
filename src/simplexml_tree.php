@@ -158,13 +158,15 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 		
 		// If things are in the current namespace, display them a bit differently
 		$is_current_namespace = ( $ns_uri == reset($item_ns) );
-		
+
+		$ns_uri_quoted = (strlen($ns_uri) == 0 ? 'null' : "'$ns_uri'");
+
 		if ( count($attributes) > 0 )
 		{
 			if ( ! $is_current_namespace )
 			{
 				$dump .= str_repeat($indent, $depth)
-					. "->attributes('$ns_alias', true)" . PHP_EOL;
+					. "->attributes($ns_uri_quoted)" . PHP_EOL;
 			}
 			
 			foreach ( $attributes as $sx_attribute )
@@ -219,7 +221,7 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 			else
 			{
 				$dump .= str_repeat($indent, $depth)
-					. "->children('$ns_alias', true)" . PHP_EOL;
+					. "->children($ns_uri_quoted)" . PHP_EOL;
 				$display_depth = $depth + 1;
 			}
 			
