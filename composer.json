@@ -13,7 +13,10 @@
 		"role": "Contributor"
 	}],
 	"autoload": {
-		"classmap": ["src/"]
+		"files": [
+			"src/simplexml_dump.php",
+			"src/simplexml_tree.php"
+		]
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^4.8"
