@@ -39,22 +39,26 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 		// It's surprisingly hard to find something which behaves consistently differently for an attribute and an element within SimpleXML
 		// The below relies on the fact that the DOM makes a much clearer distinction
 		// Note that this is not an expensive conversion, as we are only swapping PHP wrappers around an existing LibXML resource
-		if ( dom_import_simplexml($item) instanceOf DOMAttr )
+		$dom_item = dom_import_simplexml($item);
+
+		// To what namespace does this element or attribute belong? Returns array( alias => URI )
+		$ns_prefix = $dom_item->prefix;
+		$ns_uri = $dom_item->namespaceURI;
+
+		if ( $dom_item instanceOf DOMAttr )
 		{
 			$dump .= $indent . 'Attribute {' . PHP_EOL;
 
-			// To what namespace does this attribute belong? Returns array( alias => URI )
-			$ns = $item->getNamespaces(false);
-			if ( $ns )
+			if ( ! is_null($ns_uri) )
 			{
-				$dump .= $indent . $indent . 'Namespace: \'' . reset($ns) . '\'' . PHP_EOL;
-				if ( key($ns) == '' )
+				$dump .= $indent . $indent . 'Namespace: \'' . $ns_uri . '\'' . PHP_EOL;
+				if ( $ns_prefix == '' )
 				{
 					$dump .= $indent . $indent . '(Default Namespace)' . PHP_EOL;
 				}
 				else
 				{
-					$dump .= $indent . $indent . 'Namespace Alias: \'' . key($ns) . '\'' . PHP_EOL;
+					$dump .= $indent . $indent . 'Namespace Alias: \'' . $ns_prefix . '\'' . PHP_EOL;
 				}
 			}
 
@@ -67,18 +71,16 @@ function simplexml_dump(SimpleXMLElement $sxml, $return=false)
 		{
 			$dump .= $indent . 'Element {' . PHP_EOL;
 
-			// To what namespace does this element belong? Returns array( alias => URI )
-			$ns = $item->getNamespaces(false);
-			if ( $ns )
+			if ( ! is_null($ns_uri) )
 			{
-				$dump .= $indent . $indent . 'Namespace: \'' . reset($ns) . '\'' . PHP_EOL;
-				if ( key($ns) == '' )
+				$dump .= $indent . $indent . 'Namespace: \'' . $ns_uri . '\'' . PHP_EOL;
+				if ( $ns_prefix == '' )
 				{
 					$dump .= $indent . $indent . '(Default Namespace)' . PHP_EOL;
 				}
 				else
 				{
-					$dump .= $indent . $indent . 'Namespace Alias: \'' . key($ns) . '\'' . PHP_EOL;
+					$dump .= $indent . $indent . 'Namespace Alias: \'' . $ns_prefix . '\'' . PHP_EOL;
 				}
 			}
 

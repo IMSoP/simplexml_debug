@@ -37,17 +37,20 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_string_content=false, $
 	{
 		$root_item = $sxml[$root_item_index];
 		
+		// The DOM exposes information which SimpleXML doesn't make easy to find
+		// Note that this is not an expensive conversion, as we are only swapping PHP wrappers around an existing LibXML resource
+		$dom_item = dom_import_simplexml($root_item);
+
+		// To what namespace does this element or attribute belong?
+		$ns_prefix = $dom_item->prefix;
+
 		// Special case if the root is actually an attribute
 		// It's surprisingly hard to find something which behaves consistently differently for an attribute and an element within SimpleXML
-		// The below relies on the fact that the DOM makes a much clearer distinction
-		// Note that this is not an expensive conversion, as we are only swapping PHP wrappers around an existing LibXML resource
-		if ( dom_import_simplexml($root_item) instanceOf DOMAttr )
+		if ( $dom_item instanceOf DOMAttr )
 		{
-			// To what namespace does this attribute belong? Returns array( alias => URI )
-			$ns = $root_item->getNamespaces(false);
-			if ( key($ns) )
+			if ( $ns_prefix )
 			{
-				$dump .= key($ns) . ':';
+				$dump .= $ns_prefix . ':';
 			}
 			$dump .=  $root_item->getName() . '="' . (string)$root_item . '"' . PHP_EOL;
 		}
@@ -55,12 +58,10 @@ function simplexml_tree(SimpleXMLElement $sxml, $include_string_content=false, $
 		{
 			// Display the root node as a numeric key reference, plus a hint as to its tag name 
 			// e.g. '[42] // <Answer>'
-			
-			// To what namespace does this attribute belong? Returns array( alias => URI )
-			$ns = $root_item->getNamespaces(false);
-			if ( key($ns) )
+
+			if ( $ns_prefix )
 			{
-				$root_node_name = key($ns) . ':' . $root_item->getName();
+				$root_node_name = $ns_prefix . ':' . $root_item->getName();
 			}
 			else
 			{
@@ -123,19 +124,22 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 		}
 	}
 
-	// To what namespace does this element belong? Returns array( alias => URI )
+	// The DOM exposes information which SimpleXML doesn't make easy to find
+	// Note that this is not an expensive conversion, as we are only swapping PHP wrappers around an existing LibXML resource
+	$dom_item = dom_import_simplexml($item);
+
+	// To what namespace does this element or attribute belong?
+
 	// For top-level elements, cheat, and say they're in the null namespace, to force a ->children() call
 	if ( $depth == 1 )
 	{
-		$item_ns = array('' => NULL);
+		$item_ns_prefix = '';
+		$item_ns_uri = null;
 	}
 	else
 	{
-		$item_ns = $item->getNamespaces(false);
-		if ( !$item_ns )
-		{
-			$item_ns = array('' => NULL);
-		}
+		$item_ns_prefix = $dom_item->prefix;
+		$item_ns_uri = $dom_item->namespaceURI;
 	}
 
 	// This returns all namespaces used by this node and all its descendants,
@@ -146,18 +150,21 @@ function _simplexml_tree_recursively_process_node($item, $depth, $include_string
 	{
 		$all_ns[''] = NULL;
 	}
-	
+
 	// Prioritise "current" namespace by merging into onto the beginning of the list
 	// (it will be added to the beginning and the duplicate entry dropped)  
-	$all_ns = array_merge($item_ns, $all_ns);
-	
+	$all_ns = array_merge(
+		array($item_ns_prefix => $item_ns_uri),
+		$all_ns
+	);
+
 	foreach ( $all_ns as $ns_alias => $ns_uri )
 	{
 		$children = $item->children($ns_alias, true);
 		$attributes = $item->attributes($ns_alias, true);
 		
 		// If things are in the current namespace, display them a bit differently
-		$is_current_namespace = ( $ns_uri == reset($item_ns) );
+		$is_current_namespace = ( $ns_uri == $item_ns_uri );
 
 		$ns_uri_quoted = (strlen($ns_uri) == 0 ? 'null' : "'$ns_uri'");
 
