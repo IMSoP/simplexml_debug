@@ -7,9 +7,7 @@ SimpleXML object (1 item)
 		String Content: '
     
 '
-		Content in Default Namespace
-			Namespace URI: 'https://github.com/IMSoP/simplexml_debug'
+		Content in Namespace 'https://github.com/IMSoP/simplexml_debug'
 			Children: 1 - 1 'movie'
-			Attributes: 0
 	}
 ]

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<Foo xmlns="http://example.com" InvisibleAttribute="You ain't seen me, right?">
+    <MaskingChildElement/>
+</Foo>

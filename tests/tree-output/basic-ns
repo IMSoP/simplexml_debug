@@ -1,5 +1,5 @@
 SimpleXML object (1 item)
-[0] // <movies>
+[0] // <test:movies>
 	->children('https://github.com/IMSoP/simplexml_debug')
 		->movie[0]
 			->title[0]
@@ -14,8 +14,6 @@ SimpleXML object (1 item)
 			->great-lines[0]
 				->line[0]
 			->rating[0]
-				->attributes(null)
-					->type
+				['type']
 			->rating[1]
-				->attributes(null)
-					->type
+				['type']

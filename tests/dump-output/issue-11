@@ -3,9 +3,7 @@ SimpleXML object (1 item)
 	Element {
 		Name: 'notinnamespace'
 		String Content: ''
-		Content in Namespace test
-			Namespace URI: 'http://example.com'
-			Children: 0
+		Content in Namespace 'http://example.com'
 			Attributes: 1 - 'isinnamespace'
 	}
 ]

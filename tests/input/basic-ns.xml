@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<movies xmlns:test="https://github.com/IMSoP/simplexml_debug">
+<test:movies xmlns:test="https://github.com/IMSoP/simplexml_debug">
     <test:movie>
         <test:title>PHP: Behind the Parser</test:title>
         <test:characters>
@@ -20,7 +20,7 @@
         <test:great-lines>
             <test:line>PHP solves all my web problems</test:line>
         </test:great-lines>
-        <test:rating type="thumbs">7</test:rating>
-        <test:rating type="stars">5</test:rating>
+        <test:rating test:type="thumbs">7</test:rating>
+        <test:rating test:type="stars">5</test:rating>
     </test:movie>
-</movies>
+</test:movies>
